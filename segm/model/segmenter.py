@@ -233,38 +233,11 @@ class Segmenter(nn.Module):
             ep_x = ep_x[:, num_extra_tokens:]
             query_x_cor = query_x_cor[:, num_extra_tokens:]
             ep_x_cor = ep_x_cor[:, num_extra_tokens:]
-        # # correlation
-        # query_mask_embed, ep_mask_embed, cor_map = self.correlation(query_x_cor, ep_x_cor, lim_gt)# [b,N,c] #[b,N,c]
+       
         
         # painter
         latent, query_mask_embed, ep_mask_embed, gen_loss = self.painter(query_x_cor, ep_x_cor, gim_gt, lim_gt, random_mask)
         
-        # region
-        ###  add example feature to query feature
-        # Hp = latent.shape[1] // 2
-        # ep_latent = latent[:,:Hp,:,:] #[b,32,32,768]
-        # #query_latent = self.alpha * (latent[:,Hp:,:,:]) + (1-self.alpha) * (ep_latent)
-        # query_latent = 0.7 * (latent[:,Hp:,:,:]) + (1 - 0.7) * (ep_latent)
-        # query_mask_embed = query_latent
-        # latent = torch.cat((ep_latent, query_latent), 1)
-        # #print(self.alpha)
-        ####
-
-        ############ Non_local
-        # Hp = latent.shape[1] // 2
-        # ep_latent = latent[:,:Hp,:,:] #[b,32,32,768]
-
-        # # ep_mask_32 = lim_gt.squeeze(0).permute(1,2,0).cpu().numpy().astype(np.uint8)
-        # # ep_mask_32 = cv2.resize(ep_mask_32, (32,32),) #[1,1,32,32] -> [1,32,32,1]
-        # # ep_mask_32 = torch.from_numpy(ep_mask_32[None,:,:,None]).cuda()
-    
-        # query_latent = latent[:,Hp:,:,:]
-        #                                        #b,32,32,c        b,32,32,c        
-        # query_mask_embed, _, _ = self.Non_local(query_latent, ep_latent, ep_latent)
-        # latent = torch.cat((ep_latent, query_mask_embed), 1)
-        # ep_mask_embed = ep_latent
-        ############
-        #endregion
         #show mask feature
         query_mask_embed_ = torch.mean(query_mask_embed, dim=-1)
         query_mask_embed_ = query_mask_embed_.view(b,h,w).squeeze()
@@ -275,16 +248,6 @@ class Segmenter(nn.Module):
         ep_x_ = torch.mean(ep_x, dim=-1)
         ep_x_ = ep_x_.view(b,h,w).squeeze()
         
-        # add_encoder for segmentation x3 layers, has norm layer
-        # query_x_seg = self.add_seg_encoder(query_x)
-        # ep_x_seg = self.add_seg_encoder(ep_x)
-  
-          # remove CLS/DIST tokens for correlation
-        # if hasattr(self.encoder, 'distilled'):
-        #     num_extra_tokens = 1 + self.encoder.distilled
-        #     query_x_seg = query_x_seg[:, num_extra_tokens:]
-        #     ep_x_seg = ep_x_seg[:, num_extra_tokens:]
-  
         # decoder
         #print(latent.view(b,-1,c).shape)
         decoder_mask = self.decoder(latent.view(b,-1,c), (2*gH, gW)) #[b,n_cls,32,32]
