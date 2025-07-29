@@ -2,7 +2,7 @@
 
 **Dataset**
 
-We are organizing our benchmark **UniMedDB**, and we will release the official version.
+We are organizing our benchmark **UniMedDB**, and we will release the official version. Once you have downloaded **UniMedDB.tar.gz**, unzip it and place all datasets in Meddata. Specifically, for OOD datasets, you should create a new sub-folder named "not_train" in Meddata, and put all OOD datasets into "Meddata/not_train".
 
 **Train**
 
@@ -12,7 +12,7 @@ You can train SegMIC by:
 
 **Inference**
 
-You can inference SegMIC by:
+You can infer SegMIC by:
 
 `bash inference_per_label.sh`
 
